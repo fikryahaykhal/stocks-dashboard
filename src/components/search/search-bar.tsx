@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, Search, X } from "lucide-react";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import type { SearchResult } from "@/lib/types";
+
 export function SearchBar() {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -54,19 +55,21 @@ export function SearchBar() {
   }
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-md">
+    <div ref={containerRef} id="search" className="relative w-full scroll-mt-24">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
-          type="text"
+          type="search"
+          inputMode="search"
+          autoComplete="off"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
             setOpen(true);
           }}
           onFocus={() => results.length > 0 && setOpen(true)}
-          placeholder="Search stocks (e.g. AAPL, Tesla)..."
-          className="w-full rounded-lg border border-border bg-muted/30 py-2.5 pl-10 pr-10 text-sm outline-none ring-primary/50 transition focus:border-primary/50 focus:ring-2"
+          placeholder="Search symbol or company"
+          className="h-11 w-full rounded-xl border border-border/80 bg-muted/40 pl-10 pr-11 text-base outline-none transition placeholder:text-muted-foreground/80 focus:border-primary/40 focus:bg-muted/60 focus:ring-2 focus:ring-primary/20 md:h-10 md:text-sm"
           aria-label="Search stocks"
           aria-autocomplete="list"
         />
@@ -77,7 +80,7 @@ export function SearchBar() {
               setQuery("");
               setResults([]);
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="touch-target absolute right-1 top-1/2 flex -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground active:bg-muted/60"
             aria-label="Clear search"
           >
             {loading ? (
@@ -91,7 +94,7 @@ export function SearchBar() {
 
       {open && results.length > 0 && (
         <ul
-          className="absolute z-50 mt-2 max-h-72 w-full overflow-auto rounded-lg border border-border bg-popover py-1 shadow-xl"
+          className="absolute z-50 mt-2 max-h-[min(20rem,50dvh)] w-full overflow-auto rounded-xl border border-border bg-popover py-1 shadow-2xl"
           role="listbox"
         >
           {results.map((item) => (
@@ -99,7 +102,7 @@ export function SearchBar() {
               <button
                 type="button"
                 onClick={() => selectSymbol(item.symbol)}
-                className="flex w-full flex-col gap-0.5 px-4 py-2.5 text-left hover:bg-muted/60"
+                className="flex w-full flex-col gap-0.5 px-4 py-3 text-left active:bg-muted/60 md:py-2.5 md:hover:bg-muted/50"
               >
                 <span className="font-medium">{item.displaySymbol}</span>
                 <span className="text-xs text-muted-foreground line-clamp-1">

@@ -3,10 +3,8 @@
 import { useMemo, useState } from "react";
 import { MarketOverview } from "@/components/dashboard/market-overview";
 import { NewsFeed } from "@/components/dashboard/news-feed";
-import {
-  WatchlistAddHint,
-  WatchlistTable,
-} from "@/components/dashboard/watchlist-table";
+import { WatchlistTable } from "@/components/dashboard/watchlist-table";
+import { SectionHeading } from "@/components/ui/section-heading";
 import {
   applyLivePrice,
   useFinnhubSocket,
@@ -38,7 +36,7 @@ export function DashboardClient() {
   });
 
   const indexQuotes = useMemo(() => {
-    const map: Record<string, typeof quotes[string]> = {};
+    const map: Record<string, (typeof quotes)[string]> = {};
     for (const index of MARKET_INDICES) {
       if (quotes[index.finnhubSymbol]) {
         map[index.finnhubSymbol] = quotes[index.finnhubSymbol];
@@ -48,18 +46,17 @@ export function DashboardClient() {
   }, [quotes]);
 
   return (
-    <div className="space-y-8 p-6">
+    <div className="page-container space-y-8">
       {error && (
         <div
           role="alert"
-          className="rounded-lg border border-loss/30 bg-loss/10 px-4 py-3 text-sm text-loss"
+          className="rounded-xl border border-loss/25 bg-loss/10 px-4 py-3 text-sm text-loss"
         >
           {error}
           {error.includes("FINNHUB_API_KEY") && (
             <span>
               {" "}
-              Copy <code className="text-xs">.env.example</code> to{" "}
-              <code className="text-xs">.env.local</code> and add your free key from{" "}
+              Add your key to <code className="text-xs">.env.local</code> — free at{" "}
               <a
                 href="https://finnhub.io/register"
                 target="_blank"
@@ -76,15 +73,12 @@ export function DashboardClient() {
 
       <MarketOverview quotes={indexQuotes} loading={loading} />
 
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-            Your Watchlist
-          </h3>
-          <span className="text-xs text-muted-foreground">{symbols.length} symbols</span>
-        </div>
+      <section id="watchlist">
+        <SectionHeading
+          title="Watchlist"
+          description={`${symbols.length} ${symbols.length === 1 ? "symbol" : "symbols"}`}
+        />
         <WatchlistTable quotes={quotes} loading={loading} liveSymbols={liveSymbols} />
-        <WatchlistAddHint />
       </section>
 
       <NewsFeed />

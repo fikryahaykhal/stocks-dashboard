@@ -6,6 +6,7 @@ interface PriceChangeProps {
   percentChange: number;
   size?: "sm" | "md" | "lg";
   showIcon?: boolean;
+  className?: string;
 }
 
 export function PriceChange({
@@ -13,6 +14,7 @@ export function PriceChange({
   percentChange,
   size = "md",
   showIcon = true,
+  className,
 }: PriceChangeProps) {
   const positive = isPositiveChange(change);
   const Icon = positive ? TrendingUp : TrendingDown;
@@ -25,6 +27,7 @@ export function PriceChange({
         size === "sm" && "text-xs",
         size === "md" && "text-sm",
         size === "lg" && "text-base",
+        className,
       )}
     >
       {showIcon && <Icon className={cn(size === "sm" ? "h-3 w-3" : "h-4 w-4")} />}

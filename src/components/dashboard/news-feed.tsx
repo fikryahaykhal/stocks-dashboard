@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { ExternalLink, Newspaper } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { SectionHeading } from "@/components/ui/section-heading";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { MarketNews } from "@/lib/types";
 
@@ -25,64 +26,59 @@ export function NewsFeed() {
 
   return (
     <section aria-label="Market news">
-      <div className="mb-3 flex items-center gap-2">
-        <Newspaper className="h-4 w-4 text-primary" />
-        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-          Market News
-        </h3>
-      </div>
+      <SectionHeading title="News" description="Latest market headlines" />
 
-      <Card className="divide-y divide-border max-h-[520px] overflow-y-auto">
+      <div className="space-y-2">
         {loading &&
-          Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="p-4 space-y-2">
-              <Skeleton className="h-4 w-3/4" />
+          Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="p-4 space-y-2">
+              <Skeleton className="h-4 w-4/5" />
               <Skeleton className="h-3 w-full" />
-            </div>
+            </Card>
           ))}
 
         {error && (
-          <p className="p-4 text-sm text-loss">{error}</p>
+          <Card className="p-4 text-sm text-loss">{error}</Card>
         )}
 
         {!loading &&
           !error &&
           news.map((item) => (
-            <article key={item.id} className="p-4 hover:bg-muted/20 transition">
+            <Card key={item.id} className="overflow-hidden">
               <a
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex gap-3"
+                className="group flex gap-3 p-4 active:bg-muted/30"
               >
                 {item.image && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={item.image}
                     alt=""
-                    className="h-14 w-14 shrink-0 rounded object-cover bg-muted"
+                    className="h-16 w-16 shrink-0 rounded-lg object-cover bg-muted"
                   />
                 )}
                 <div className="min-w-0 flex-1">
-                  <h4 className="font-medium leading-snug group-hover:text-primary line-clamp-2">
+                  <h4 className="font-medium leading-snug line-clamp-2 group-active:text-primary">
                     {item.headline}
                   </h4>
-                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                  <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground line-clamp-2">
                     {item.summary}
                   </p>
-                  <p className="mt-2 flex items-center gap-2 text-[10px] text-muted-foreground">
+                  <p className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
                     <span>{item.source}</span>
-                    <span>·</span>
+                    <span aria-hidden>·</span>
                     <span>
                       {formatDistanceToNow(item.datetime * 1000, { addSuffix: true })}
                     </span>
-                    <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100" />
+                    <ExternalLink className="ml-auto h-3 w-3 opacity-60" />
                   </p>
                 </div>
               </a>
-            </article>
+            </Card>
           ))}
-      </Card>
+      </div>
     </section>
   );
 }

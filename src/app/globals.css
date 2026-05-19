@@ -1,47 +1,80 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0a0e17;
-  --color-foreground: #f1f5f9;
-  --color-card: #111827;
-  --color-popover: #1e293b;
-  --color-primary: #3b82f6;
-  --color-primary-foreground: #ffffff;
-  --color-muted: #1e293b;
-  --color-muted-foreground: #94a3b8;
-  --color-border: #1e293b;
-  --color-sidebar: #0f1419;
-  --color-gain: #22c55e;
-  --color-loss: #ef4444;
+  --color-background: #070b12;
+  --color-foreground: #f8fafc;
+  --color-card: #0f1419;
+  --color-popover: #151b24;
+  --color-primary: #60a5fa;
+  --color-primary-foreground: #0f172a;
+  --color-muted: #1a2332;
+  --color-muted-foreground: #8b9cb3;
+  --color-border: #1e2a3a;
+  --color-sidebar: #0a0e14;
+  --color-gain: #34d399;
+  --color-loss: #f87171;
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --spacing-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --spacing-safe-top: env(safe-area-inset-top, 0px);
 }
 
 * {
   border-color: var(--color-border);
 }
 
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
+  overscroll-behavior-y: none;
+}
+
+@utility page-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 42rem;
+  padding-inline: 1rem;
+  padding-block: 1rem;
+
+  @media (width >= 768px) {
+    max-width: 56rem;
+    padding-inline: 1.5rem;
+    padding-block: 1.5rem;
+  }
+
+  @media (width >= 1024px) {
+    max-width: 72rem;
+    padding-block: 2rem;
+  }
+}
+
+@utility touch-target {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-muted);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-muted-foreground);
+  border-radius: 999px;
 }

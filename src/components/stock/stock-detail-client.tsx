@@ -13,7 +13,7 @@ import {
   useFinnhubSocket,
 } from "@/hooks/use-finnhub-socket";
 import type { StockProfile, StockQuote } from "@/lib/types";
-import { formatCompactNumber, formatPrice } from "@/lib/utils";
+import { cn, formatCompactNumber, formatPrice } from "@/lib/utils";
 import { useWatchlistStore } from "@/store/watchlist-store";
 
 interface StockDetailClientProps {
@@ -64,52 +64,52 @@ export function StockDetailClient({ symbol }: StockDetailClientProps) {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="page-container space-y-5 pb-6">
       <Link
         href="/"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground active:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to dashboard
+        Back
       </Link>
 
       {error && (
-        <div role="alert" className="rounded-lg border border-loss/30 bg-loss/10 px-4 py-3 text-sm text-loss">
+        <div
+          role="alert"
+          className="rounded-xl border border-loss/25 bg-loss/10 px-4 py-3 text-sm text-loss"
+        >
           {error}
         </div>
       )}
 
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex items-start gap-4">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start gap-3">
           {profile?.logo ? (
             <Image
               src={profile.logo}
-              alt={`${upper} logo`}
-              width={56}
-              height={56}
-              className="rounded-lg bg-white p-1"
+              alt=""
+              width={48}
+              height={48}
+              className="h-12 w-12 shrink-0 rounded-xl bg-white p-1"
               unoptimized
             />
           ) : (
-            <Skeleton className="h-14 w-14 rounded-lg" />
+            <Skeleton className="h-12 w-12 shrink-0 rounded-xl" />
           )}
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold tracking-tight">{upper}</h1>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl font-bold tracking-tight">{upper}</h1>
               {isLive && (
-                <span className="rounded-full bg-gain/15 px-2 py-0.5 text-[10px] font-medium text-gain">
+                <span className="rounded-full bg-gain/12 px-2 py-0.5 text-[10px] font-semibold text-gain">
                   LIVE
                 </span>
               )}
             </div>
             {loading ? (
-              <Skeleton className="mt-2 h-5 w-48" />
+              <Skeleton className="mt-1.5 h-4 w-40" />
             ) : (
-              <p className="text-muted-foreground">{profile?.name ?? upper}</p>
-            )}
-            {profile && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                {profile.exchange} · {profile.industry} · {profile.country}
+              <p className="mt-0.5 truncate text-sm text-muted-foreground">
+                {profile?.name ?? upper}
               </p>
             )}
           </div>
@@ -118,7 +118,7 @@ export function StockDetailClient({ symbol }: StockDetailClientProps) {
         <button
           type="button"
           onClick={toggleWatchlist}
-          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted/50"
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-border bg-muted/30 text-sm font-medium active:bg-muted/50 md:w-auto md:px-5"
         >
           {inWatchlist ? (
             <>
@@ -134,56 +134,79 @@ export function StockDetailClient({ symbol }: StockDetailClientProps) {
         </button>
       </div>
 
-      <Card className="p-6">
+      <Card className="p-5">
         {loading ? (
-          <Skeleton className="h-10 w-40" />
+          <Skeleton className="h-9 w-36" />
         ) : quote ? (
           <>
-            <p className="text-4xl font-bold tabular-nums">{formatPrice(quote.current)}</p>
+            <p className="text-3xl font-bold tabular-nums tracking-tight md:text-4xl">
+              {formatPrice(quote.current)}
+            </p>
             <div className="mt-2">
-              <PriceChange change={quote.change} percentChange={quote.percentChange} size="lg" />
+              <PriceChange change={quote.change} percentChange={quote.percentChange} size="md" />
             </div>
           </>
         ) : null}
       </Card>
 
-      <Card className="p-4">
+      <Card className="p-3 md:p-4">
         <StockChart symbol={upper} />
       </Card>
 
       {quote && (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
           <StatCard label="Open" value={formatPrice(quote.open)} />
           <StatCard label="High" value={formatPrice(quote.high)} />
           <StatCard label="Low" value={formatPrice(quote.low)} />
-          <StatCard label="Prev Close" value={formatPrice(quote.previousClose)} />
-          {profile && (
-            <StatCard label="Market Cap" value={formatCompactNumber(profile.marketCap)} />
-          )}
-          {profile?.weburl && (
-            <Card className="flex items-center justify-center p-4 sm:col-span-2">
-              <a
-                href={profile.weburl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-              >
-                Company website
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            </Card>
+          <StatCard label="Prev close" value={formatPrice(quote.previousClose)} />
+          {profile && profile.marketCap > 0 && (
+            <StatCard
+              label="Market cap"
+              value={formatCompactNumber(profile.marketCap)}
+              className="col-span-2 md:col-span-1"
+            />
           )}
         </div>
+      )}
+
+      {profile?.weburl && (
+        <a
+          href={profile.weburl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex h-11 items-center justify-center gap-2 rounded-xl border border-border text-sm font-medium text-primary active:bg-muted/30"
+        >
+          Company website
+          <ExternalLink className="h-4 w-4" />
+        </a>
+      )}
+
+      {profile && (
+        <p className="text-center text-xs text-muted-foreground">
+          {profile.exchange} · {profile.industry}
+        </p>
       )}
     </div>
   );
 }
 
-function StatCard({ label, value }: { label: string; value: string }) {
+function StatCard({
+  label,
+  value,
+  className,
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
   return (
-    <Card className="p-4">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 text-lg font-semibold tabular-nums">{value}</p>
+    <Card className={cn(className)}>
+      <div className="p-3.5">
+        <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+          {label}
+        </p>
+        <p className="mt-1 text-base font-semibold tabular-nums">{value}</p>
+      </div>
     </Card>
   );
 }

@@ -55,24 +55,24 @@ export function StockChart({ symbol }: StockChartProps) {
     const chart = createChart(containerRef.current, {
       layout: {
         background: { type: ColorType.Solid, color: "transparent" },
-        textColor: "#94a3b8",
+        textColor: "#8b9cb3",
       },
       grid: {
-        vertLines: { color: "rgba(148, 163, 184, 0.08)" },
-        horzLines: { color: "rgba(148, 163, 184, 0.08)" },
+        vertLines: { color: "rgba(139, 156, 179, 0.06)" },
+        horzLines: { color: "rgba(139, 156, 179, 0.06)" },
       },
-      rightPriceScale: { borderColor: "rgba(148, 163, 184, 0.2)" },
-      timeScale: { borderColor: "rgba(148, 163, 184, 0.2)" },
+      rightPriceScale: { borderVisible: false },
+      timeScale: { borderVisible: false },
       crosshair: { mode: 1 },
     });
 
     const series = chart.addSeries(CandlestickSeries, {
-      upColor: "#22c55e",
-      downColor: "#ef4444",
-      borderUpColor: "#22c55e",
-      borderDownColor: "#ef4444",
-      wickUpColor: "#22c55e",
-      wickDownColor: "#ef4444",
+      upColor: "#34d399",
+      downColor: "#f87171",
+      borderUpColor: "#34d399",
+      borderDownColor: "#f87171",
+      wickUpColor: "#34d399",
+      wickDownColor: "#f87171",
     });
 
     chartRef.current = chart;
@@ -107,9 +107,7 @@ export function StockChart({ symbol }: StockChartProps) {
         if (!seriesRef.current) return;
 
         const chartData = candles.map((c) => ({
-          time: (resolution === "D" || resolution === "W" || resolution === "M"
-            ? c.time
-            : c.time) as Time,
+          time: c.time as Time,
           open: c.open,
           high: c.high,
           low: c.low,
@@ -127,17 +125,17 @@ export function StockChart({ symbol }: StockChartProps) {
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-1">
+      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5 scrollbar-none">
         {CHART_RESOLUTIONS.map((r) => (
           <button
             key={r.value}
             type="button"
             onClick={() => setResolution(r.value as ChartResolution)}
             className={cn(
-              "rounded-md px-3 py-1 text-xs font-medium transition",
+              "shrink-0 rounded-lg px-3.5 py-2 text-xs font-medium transition active:scale-[0.98]",
               resolution === r.value
                 ? "bg-primary text-primary-foreground"
-                : "bg-muted/50 text-muted-foreground hover:text-foreground",
+                : "bg-muted/50 text-muted-foreground",
             )}
           >
             {r.label}
@@ -145,18 +143,18 @@ export function StockChart({ symbol }: StockChartProps) {
         ))}
       </div>
 
-      <div className="relative h-[400px] w-full rounded-lg border border-border bg-muted/10">
+      <div className="relative h-56 w-full rounded-xl bg-muted/20 sm:h-72 md:h-80">
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Skeleton className="h-full w-full rounded-lg" />
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <Skeleton className="h-full w-full rounded-xl" />
           </div>
         )}
         {error && (
-          <p className="absolute inset-0 flex items-center justify-center text-sm text-loss">
+          <p className="absolute inset-0 flex items-center justify-center px-4 text-center text-sm text-loss">
             {error}
           </p>
         )}
-        <div ref={containerRef} className="h-full w-full" />
+        <div ref={containerRef} className="h-full w-full rounded-xl" />
       </div>
     </div>
   );

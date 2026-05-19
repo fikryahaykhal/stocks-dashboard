@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { PriceChange } from "@/components/ui/price-change";
+import { SectionHeading } from "@/components/ui/section-heading";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MARKET_INDICES } from "@/lib/constants";
 import type { StockQuote } from "@/lib/types";
@@ -16,50 +17,74 @@ interface MarketOverviewProps {
 export function MarketOverview({ quotes, loading }: MarketOverviewProps) {
   return (
     <section aria-label="Market indices">
-      <h3 className="mb-3 text-sm font-medium text-muted-foreground uppercase tracking-wider">
-        Major Indices (ETF proxies)
-      </h3>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {MARKET_INDICES.map((index) => {
-          const quote = quotes[index.finnhubSymbol];
-          return (
-            <Card key={index.symbol} className="p-4 transition hover:border-primary/30">
-              {loading && !quote ? (
-                <IndexSkeleton />
-              ) : quote ? (
-                <Link href={`/stock/${index.finnhubSymbol}`} className="block">
-                  <p className="text-xs text-muted-foreground">{index.label}</p>
-                  <p className="mt-1 text-2xl font-semibold tabular-nums">
-                    {formatPrice(quote.current)}
-                  </p>
-                  <div className="mt-2">
-                    <PriceChange
-                      change={quote.change}
-                      percentChange={quote.percentChange}
-                      size="sm"
-                    />
-                  </div>
-                  <p className="mt-2 text-[10px] text-muted-foreground">
-                    via {index.finnhubSymbol}
-                  </p>
-                </Link>
-              ) : (
-                <p className="text-sm text-muted-foreground">Unavailable</p>
-              )}
-            </Card>
-          );
-        })}
+      <SectionHeading title="Markets" description="Major index ETFs" />
+
+      {/* Mobile: horizontal scroll */}
+      <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 snap-x snap-mandatory scrollbar-none md:hidden">
+        {MARKET_INDICES.map((index) => (
+          <IndexCard
+            key={index.symbol}
+            index={index}
+            quote={quotes[index.finnhubSymbol]}
+            loading={loading}
+            className="w-[9.5rem] shrink-0 snap-start"
+          />
+        ))}
+      </div>
+
+      {/* Tablet+ */}
+      <div className="hidden gap-3 md:grid md:grid-cols-2 lg:grid-cols-4">
+        {MARKET_INDICES.map((index) => (
+          <IndexCard
+            key={index.symbol}
+            index={index}
+            quote={quotes[index.finnhubSymbol]}
+            loading={loading}
+          />
+        ))}
       </div>
     </section>
   );
 }
 
-function IndexSkeleton() {
+function IndexCard({
+  index,
+  quote,
+  loading,
+  className,
+}: {
+  index: (typeof MARKET_INDICES)[number];
+  quote?: StockQuote;
+  loading: boolean;
+  className?: string;
+}) {
   return (
-    <>
-      <Skeleton className="h-3 w-20" />
-      <Skeleton className="mt-2 h-8 w-28" />
-      <Skeleton className="mt-2 h-4 w-24" />
-    </>
+    <Card className={className}>
+      {loading && !quote ? (
+        <div className="p-4">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="mt-2 h-7 w-24" />
+          <Skeleton className="mt-2 h-4 w-20" />
+        </div>
+      ) : quote ? (
+        <Link href={`/stock/${index.finnhubSymbol}`} className="block p-4 active:bg-muted/30">
+          <p className="text-xs font-medium text-muted-foreground">{index.label}</p>
+          <p className="mt-1 text-xl font-semibold tabular-nums tracking-tight">
+            {formatPrice(quote.current)}
+          </p>
+          <div className="mt-1.5">
+            <PriceChange
+              change={quote.change}
+              percentChange={quote.percentChange}
+              size="sm"
+              showIcon={false}
+            />
+          </div>
+          <p className="mt-2 text-[10px] text-muted-foreground">{index.finnhubSymbol}</p>
+        </Link>
+      ) : (
+        <p className="p-4 text-sm text-muted-foreground">Unavailable</p>
+      )}
+    </Card>
   );
 }
